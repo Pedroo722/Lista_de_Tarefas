@@ -1,6 +1,6 @@
 # Sistema Lista de Tarefas - Teste Técnico Fattocs
 
-Este repósitorio contém um projeto web que foi desenvolvido como parte de um teste técnico da *Fatto Consultoria e Sistemas*. O sistema permite o cadastro, edição, exclusão, e organização de tarefas.
+Este repósitorio contém o código front-end de um projeto web que foi desenvolvido como parte de um teste técnico da *Fatto Consultoria e Sistemas*. O sistema permite o cadastro, edição, exclusão, e organização de tarefas.
 
 Repósitorio Back-end: [Lista de Tarefas-API](https://github.com/Pedroo722/Lista_de_Tarefas-API)
 
@@ -21,7 +21,7 @@ Deploy:
 </div>
 
 <div align="center">
-<!-- 
+<!--
 ![React Hook Form](https://img.shields.io/badge/React_Hook_Form-%23EC5990?style=for-the-badge&logo=react&logoColor=white)
 ![Axios](https://img.shields.io/badge/Axios-%231C1C1C?style=for-the-badge&logo=axios&logoColor=white)
 ![Redux](https://img.shields.io/badge/Redux-%23593d88?style=for-the-badge&logo=redux&logoColor=white)
