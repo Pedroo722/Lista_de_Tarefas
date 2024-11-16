@@ -2,6 +2,8 @@
 
 Este repósitorio contém um projeto web que foi desenvolvido como parte de um teste técnico da *Fatto Consultoria e Sistemas*. O sistema permite o cadastro, edição, exclusão, e organização de tarefas.
 
+Repósitorio Back-end: [Lista de Tarefas-API](https://github.com/Pedroo722/Lista_de_Tarefas-API)
+
 Deploy:
 
 
@@ -14,7 +16,6 @@ Deploy:
 ![React](https://img.shields.io/badge/react-%2320232a?style=for-the-badge&logo=react&logoColor=%2361DAFB)
 ![Material UI](https://img.shields.io/badge/Material_UI-%23007FFF?style=for-the-badge&logo=material-ui&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-%2338B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
-![SQLite](https://img.shields.io/badge/SQLite-%2307405E?style=for-the-badge&logo=sqlite&logoColor=white)
 ![Netlify](https://img.shields.io/badge/Netlify-%23000000?style=for-the-badge&logo=netlify&logoColor=white)
 
 </div>
