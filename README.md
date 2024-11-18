@@ -4,7 +4,7 @@ Este repósitorio contém o código front-end de um projeto web que foi desenvol
 
 Repósitorio Back-end: [Lista de Tarefas-API](https://github.com/Pedroo722/Lista_de_Tarefas-API)
 
-Deploy:
+Deploy: https://teste-tecnico-pedro-fattocs.netlify.app/
 
 
 ## Tecnologias Usadas
@@ -23,16 +23,17 @@ Deploy:
 
 ## Funcionalidades
 ### 1. **Lista de Tarefas**
-- Exibe todas as tarefas cadastradas.
+- Exibe todas as tarefas cadastradas em uma tabela.
+- A tabela é paginada, exibindo até 7 tarefas de uma única vez.
 - A lista é ordenada pelo campo "Ordem de apresentação".
 - Exibe os seguintes campos para cada tarefa:
   - Nome da Tarefa
   - Custo (R$)
   - Data Limite
-- As tarefas com **Custo** maior ou igual a **R$ 1.000,00** são destacadas (por exemplo, com fundo amarelo).
+- As tarefas com **Custo** maior ou igual a **R$ 1.000,00** são destacadas (por meio de um fundo amarelo).
 - Cada tarefa possui dois botões para:
-  - **Editar**: Permite editar a tarefa (Nome, Custo, Data Limite).
-  - **Excluir**: Exclui a tarefa com confirmação (Sim/Não).
+  - **Editar**: Permitindo editar a tarefa (Nome, Custo, Data Limite).
+  - **Excluir**: Exclui a tarefa com uma pequena caixa confirmação.
 - Ao final da lista, há um botão **Incluir** para adicionar uma nova tarefa.
 
 ### 2. **Excluir**
@@ -55,9 +56,13 @@ Deploy:
   - Custo (R$)
   - Data Limite
 - O identificador e a ordem de apresentação são gerados automaticamente.
-- A nova tarefa será adicionada ao final da lista, de acordo com a ordem de apresentação.
+- A nova tarefa é adicionada ao final da lista, de acordo com a ordem de apresentação.
 
 ### 5. **Reordenação das Tarefas**
 - O usuário pode alterar a ordem de apresentação das tarefas:
   - **Arrastar e soltar (drag-and-drop)**: O usuário pode arrastar uma tarefa para cima ou para baixo na lista.
   - **Botões de subir/descer**: Cada tarefa possui botões para mover a tarefa para cima ou para baixo na ordem. A primeira tarefa não pode subir e a última não pode descer.
+
+### Funcionalidade Adicionais
+- Uma barra de pesquisa que permite o usuário rapidamente filtrar uma tarefa pelo nom.
+- O sistema tem um design responsivo, permitindo o uso em dispositivos móveis.
