@@ -20,16 +20,6 @@ Deploy:
 
 </div>
 
-<div align="center">
-<!--
-![React Hook Form](https://img.shields.io/badge/React_Hook_Form-%23EC5990?style=for-the-badge&logo=react&logoColor=white)
-![Axios](https://img.shields.io/badge/Axios-%231C1C1C?style=for-the-badge&logo=axios&logoColor=white)
-![Redux](https://img.shields.io/badge/Redux-%23593d88?style=for-the-badge&logo=redux&logoColor=white)
-![React Icons](https://img.shields.io/badge/React_Icons-%230F64A1?style=for-the-badge&logo=react&logoColor=white)
-![react-beautiful-dnd](https://img.shields.io/badge/react_beautiful_dnd-%23FF8A00?style=for-the-badge&logo=react&logoColor=white) -->
-
-</div>
-
 
 ## Funcionalidades
 ### 1. **Lista de Tarefas**
