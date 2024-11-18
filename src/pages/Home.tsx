@@ -1,16 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Box, Paper,
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  IconButton, CircularProgress,
-  Typography, TextField,
-  Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
-import { Edit, Delete, ArrowUpward, ArrowDownward } from '@mui/icons-material';
+import { Button, Box, CircularProgress, Typography, TextField, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { Modal } from 'antd';
 import { baseUrlTasks } from '../util/constants';
 import axios from 'axios';
 import { Task } from '../util/types';
 import PageSelector from '../components/PageSelector';
 import SearchBar from '../components/SearchBar';
+import TaskTable from '../components/TaskTable';
 
 const Home: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -34,7 +30,7 @@ const Home: React.FC = () => {
     setLoading(true);
     setLoadingMessage('Carregando tarefas...');
     axios
-      .get(baseUrlTasks)
+      .get(baseUrlTasks, { timeout: 15000 })
       .then((response) => {
         if (response.status === 200) {
           const dados = response.data;
@@ -47,7 +43,7 @@ const Home: React.FC = () => {
               ordemApresentacao: task.ordemApresentacao,
             }))
             .sort((a: Task, b: Task) => a.ordemApresentacao - b.ordemApresentacao);
-
+  
           setTasks(sortedTasks);
           setFilteredTasks(sortedTasks);
         } else {
@@ -57,14 +53,20 @@ const Home: React.FC = () => {
         }
       })
       .catch((error) => {
-        console.error(error);
-        setDialogMessage('Erro ao conectar com o servidor!');
+        if (error.code === 'ECONNABORTED') {
+          setDialogMessage('O servidor caiu por inatividade ou tempo limite de requisição! Por favor aguarde alguns momentos.');
+          fetchTasks();
+        } else {
+          setDialogMessage('Erro ao conectar com o servidor!');
+        }
         setDialogTitle('Erro');
         setOpenErrorDialog(true);
       })
       .finally(() => {
-        setLoading(false);
-        setLoadingMessage('');
+        if (!openErrorDialog) {
+          setLoading(false);
+          setLoadingMessage('');
+        }
       });
   };
 
@@ -108,6 +110,7 @@ const Home: React.FC = () => {
     axios
       .post(baseUrlTasks, taskToCreate)
       .then((response) => {
+        fetchTasks();
         if (response.status === 201) {
           setTasks([...tasks, response.data]);
           setDialogMessage('Tarefa criada com sucesso!');
@@ -154,6 +157,7 @@ const Home: React.FC = () => {
       axios
         .put(`${baseUrlTasks}/${currentTask.id}`, currentTask)
         .then((response) => {
+          fetchTasks();
           if (response.status === 200) {
             setTasks(tasks.map((task) => task.id === currentTask.id ? response.data : task));
             setDialogMessage('Tarefa editada com sucesso!');
@@ -213,7 +217,7 @@ const Home: React.FC = () => {
     setOpenErrorDialog(true);
   };
 
-  // Abrir Modal
+  // Modal
   const handleOpenDialog = (task: Task) => {
     setCurrentTask(task);
     setOpenDialog(true);
@@ -244,7 +248,7 @@ const Home: React.FC = () => {
       <Typography variant="h4" component="h1" sx={{ marginBottom: 3 }}>
         Lista de Fazeres
       </Typography>
-
+      
       <SearchBar query={searchQuery} onSearch={handleSearch} />
 
       {loading && (
@@ -256,49 +260,14 @@ const Home: React.FC = () => {
         </Box>
       )}
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell><strong>Nome</strong></TableCell>
-              <TableCell><strong>Custo (R$)</strong></TableCell>
-              <TableCell><strong>Data Limite</strong></TableCell>
-              <TableCell><strong>Ações</strong></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginateTasks(filteredTasks).map((task) => (
-              <TableRow
-                key={task.id}
-                sx={{
-                  '&:hover': {
-                    backgroundColor: '#f1f1f1',
-                  },
-                  backgroundColor: task.custo >= 1000 ? 'yellow' : 'transparent',
-                }}
-              >
-                <TableCell>{task.nomeTarefa}</TableCell>
-                <TableCell>{task.custo}</TableCell>
-                <TableCell>{task.dataLimite}</TableCell>
-                <TableCell>
-                  <IconButton onClick={() => handleOpenDialog(task)} sx={{ color: 'primary.main' }}>
-                    <Edit />
-                  </IconButton>
-                  <IconButton onClick={() => openDeleteConfirmation(task)} sx={{ color: 'error.main' }}>
-                    <Delete />
-                  </IconButton>
-                  <IconButton onClick={() => handleReorder(task.id, 'up')} sx={{ color: 'primary.main' }}>
-                    <ArrowUpward />
-                  </IconButton>
-                  <IconButton onClick={() => handleReorder(task.id, 'down')} sx={{ color: 'primary.main' }}>
-                    <ArrowDownward />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <TaskTable
+        tasks={tasks}
+        filteredTasks={filteredTasks}
+        paginateTasks={paginateTasks}
+        handleOpenDialog={handleOpenDialog}
+        openDeleteConfirmation={openDeleteConfirmation}
+        handleReorder={handleReorder}
+      />
 
       <PageSelector
         currentPage={currentPage}
@@ -319,9 +288,7 @@ const Home: React.FC = () => {
             custo: 0,
             dataLimite: '',
             ordemApresentacao: tasks.length + 1,
-          })
-        }
-      >
+          })}>
         Inserir Tarefa
       </Button>
 
@@ -329,9 +296,7 @@ const Home: React.FC = () => {
         title={currentTask?.id ? 'Editar Tarefa' : 'Criar Tarefa'}
         open={openDialog}
         onCancel={handleCloseDialog}
-        onOk={() =>
-          currentTask?.id ? handleEdit() : handleCreate(currentTask!)
-        }
+        onOk={() => currentTask?.id ? handleEdit() : handleCreate(currentTask!)}
       >
         <TextField
           label="Nome da Tarefa"
