@@ -1,13 +1,6 @@
 import React from 'react';
 import { Box, Pagination } from '@mui/material';
-import { Task } from '../util/types';
-
-interface PageSelectorProps {
-  currentPage: number;
-  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
-  tasksPerPage: number;
-  tasks: Task[];
-}
+import { PageSelectorProps } from '../util/types';
 
 const PageSelector: React.FC<PageSelectorProps> = ({
   currentPage,

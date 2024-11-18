@@ -1,10 +1,6 @@
 import React from 'react';
 import { TextField, Box } from '@mui/material';
-
-interface SearchBarProps {
-  query: string;
-  onSearch: (query: string) => void;
-}
+import { SearchBarProps } from '../util/types';
 
 const SearchBar: React.FC<SearchBarProps> = ({ query, onSearch }) => {
   return (
