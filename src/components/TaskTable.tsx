@@ -3,14 +3,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconB
 import { Edit, Delete, ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import { TaskTableProps } from '../util/types';
 
-const TaskTable: React.FC<TaskTableProps> = ({
-  tasks,
-  filteredTasks,
-  paginateTasks,
-  handleOpenDialog,
-  openDeleteConfirmation,
-  handleReorder,
-}) => {
+const TaskTable: React.FC<TaskTableProps> = ({ tasks, filteredTasks, paginateTasks, handleOpenDialog, openDeleteConfirmation, handleReorder }) => {
   return (
     <TableContainer>
       <Table>
