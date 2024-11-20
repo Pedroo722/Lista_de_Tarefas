@@ -1,8 +1,8 @@
 # Sistema Lista de Tarefas - Teste Técnico Fattocs
 
-Este repósitorio contém o código front-end de um projeto web que foi desenvolvido como parte de um teste técnico da *Fatto Consultoria e Sistemas*. O sistema permite o cadastro, edição, exclusão, e organização de tarefas.
+Este repositório contém o código front-end de um projeto web que foi desenvolvido como parte de um teste técnico da *Fatto Consultoria e Sistemas*. O sistema permite o cadastro, edição, exclusão, e organização de tarefas.
 
-Repósitorio Back-end: [Lista de Tarefas-API](https://github.com/Pedroo722/Lista_de_Tarefas-API)
+Repositório Back-end: [Lista de Tarefas-API](https://github.com/Pedroo722/Lista_de_Tarefas-API)
 
 Deploy: https://teste-tecnico-pedro-fattocs.netlify.app/
 
@@ -33,7 +33,7 @@ Deploy: https://teste-tecnico-pedro-fattocs.netlify.app/
 - As tarefas com **Custo** maior ou igual a **R$ 1.000,00** são destacadas (por meio de um fundo amarelo).
 - Cada tarefa possui dois botões para:
   - **Editar**: Permitindo editar a tarefa (Nome, Custo, Data Limite).
-  - **Excluir**: Exclui a tarefa com uma pequena caixa confirmação.
+  - **Excluir**: Exclui a tarefa com uma pequena caixa de confirmação.
 - Ao final da lista, há um botão **Incluir** para adicionar uma nova tarefa.
 
 ### 2. **Excluir**
@@ -63,7 +63,7 @@ Deploy: https://teste-tecnico-pedro-fattocs.netlify.app/
   - **Arrastar e soltar (drag-and-drop)**: O usuário pode arrastar uma tarefa para cima ou para baixo na lista.
   - **Botões de subir/descer**: Cada tarefa possui botões para mover a tarefa para cima ou para baixo na ordem. A primeira tarefa não pode subir e a última não pode descer.
 
-### Funcionalidade Adicionais
+### Funcionalidades Adicionais
 - Uma barra de pesquisa que permite o usuário rapidamente filtrar uma tarefa pelo nome.
 - O sistema tem um design responsivo, permitindo o uso em dispositivos móveis.
 - Testes Unitários para os componentes UI.
