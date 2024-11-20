@@ -64,5 +64,6 @@ Deploy: https://teste-tecnico-pedro-fattocs.netlify.app/
   - **Botões de subir/descer**: Cada tarefa possui botões para mover a tarefa para cima ou para baixo na ordem. A primeira tarefa não pode subir e a última não pode descer.
 
 ### Funcionalidade Adicionais
-- Uma barra de pesquisa que permite o usuário rapidamente filtrar uma tarefa pelo nom.
+- Uma barra de pesquisa que permite o usuário rapidamente filtrar uma tarefa pelo nome.
 - O sistema tem um design responsivo, permitindo o uso em dispositivos móveis.
+- Testes Unitários para os componentes UI.
