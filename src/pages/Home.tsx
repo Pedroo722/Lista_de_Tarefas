@@ -8,6 +8,7 @@ import PageSelector from '../components/PageSelector';
 import SearchBar from '../components/SearchBar';
 import TaskTable from '../components/TaskTable';
 import DialogMessage from '../components/DialogMessage';
+import { useForm, Controller } from 'react-hook-form';
 
 const Home: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -21,16 +22,26 @@ const Home: React.FC = () => {
   const [openErrorDialog, setOpenErrorDialog] = useState(false);
   const [dialogMessage, setDialogMessage] = useState<string>('');
   const [dialogTitle, setDialogTitle] = useState<string>('');
+  const [errorDisplayed, setErrorDisplayed] = useState(false);
   const tasksPerPage = 7;
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchQuery, setSearchQuery] = useState<string>('');
+
+  // React Hook Form
+  const { control, handleSubmit, formState: { errors }, reset } = useForm({
+    defaultValues: {
+      nomeTarefa: '',
+      custo: 0,
+      dataLimite: '',
+    }
+  });
 
   // Carregar Tarefas
   const fetchTasks = useCallback(() => {
     setLoading(true);
     setLoadingMessage('Carregando tarefas...');
     axios
-      .get(baseUrlTasks, { timeout: 15000 }) // 15 segundos para emitir mensagem de inatividade
+      .get(baseUrlTasks, { timeout: 15000 }) // 15 segundos e então mostra o erro
       .then((response) => {
         if (response.status === 200) {
           const dados = response.data;
@@ -43,7 +54,7 @@ const Home: React.FC = () => {
               ordemApresentacao: task.ordemApresentacao,
             }))
             .sort((a: Task, b: Task) => a.ordemApresentacao - b.ordemApresentacao);
-  
+
           setTasks(sortedTasks);
           setFilteredTasks(sortedTasks);
         } else {
@@ -53,14 +64,17 @@ const Home: React.FC = () => {
         }
       })
       .catch((error) => {
-        if (error.code === 'ECONNABORTED') {
-          setDialogMessage('O servidor caiu por inatividade ou tempo limite de requisição! Por favor aguarde alguns momentos até o servidor reiniciar.');
-          fetchTasks();
-        } else {
+        if (error.code === 'ECONNABORTED' && !errorDisplayed) {
+          setDialogMessage('O servidor caiu por inatividade! Por favor aguarde um pouco até o servidor reiniciar. O processo pode levar alguns minutos.');
+          setDialogTitle('Erro');
+          setOpenErrorDialog(true);
+          setErrorDisplayed(true);
+        } else if (!errorDisplayed) {
           setDialogMessage('Erro ao conectar com o servidor!');
+          setDialogTitle('Erro');
+          setOpenErrorDialog(true);
+          setErrorDisplayed(true);
         }
-        setDialogTitle('Erro');
-        setOpenErrorDialog(true);
       })
       .finally(() => {
         if (!openErrorDialog) {
@@ -68,7 +82,7 @@ const Home: React.FC = () => {
           setLoadingMessage('');
         }
       });
-  }, [openErrorDialog]);
+  }, [openErrorDialog, errorDisplayed]);
 
   // Pesquisa
   const handleSearch = (query: string) => {
@@ -87,12 +101,12 @@ const Home: React.FC = () => {
   };
 
   // Criar Tarefa
-  const handleCreate = (task: Task) => {
+  const handleCreate = (data: any) => {
     setLoading(true);
     setLoadingMessage('Criando tarefa...');
-  
+
     // Verificação para impedir Tarefas com mesmo nome
-    const taskExists = tasks.some((existingTask) => existingTask.nomeTarefa === task.nomeTarefa);
+    const taskExists = tasks.some((existingTask) => existingTask.nomeTarefa === data.nomeTarefa);
     if (taskExists) {
       setDialogMessage('Já existe uma tarefa com esse nome!');
       setDialogTitle('Erro');
@@ -100,13 +114,13 @@ const Home: React.FC = () => {
       setLoading(false);
       return;
     }
-  
+
     const taskToCreate = {
-      nomeTarefa: task.nomeTarefa,
-      custo: task.custo,
-      dataLimite: task.dataLimite || '',
+      nomeTarefa: data.nomeTarefa,
+      custo: data.custo,
+      dataLimite: data.dataLimite || '',
     };
-  
+
     axios
       .post(baseUrlTasks, taskToCreate)
       .then((response) => {
@@ -133,17 +147,17 @@ const Home: React.FC = () => {
         setLoadingMessage('');
       });
   };
-  
+
   // Editar Tarefa
-  const handleEdit = () => {
+  const handleEdit = (data: any) => {
     if (currentTask) {
       setLoading(true);
       setLoadingMessage('Editando tarefa...');
-  
+
       // Verificação para impedir Tarefas com mesmo nome
       const taskExists = tasks.some(
         (existingTask) =>
-          existingTask.nomeTarefa === currentTask.nomeTarefa && existingTask.id !== currentTask.id
+          existingTask.nomeTarefa === data.nomeTarefa && existingTask.id !== currentTask.id
       );
       if (taskExists) {
         setDialogMessage('Já existe uma tarefa com esse nome!');
@@ -152,9 +166,9 @@ const Home: React.FC = () => {
         setLoading(false);
         return;
       }
-  
+
       axios
-        .put(`${baseUrlTasks}/${currentTask.id}`, currentTask)
+        .put(`${baseUrlTasks}/${currentTask.id}`, data)
         .then((response) => {
           fetchTasks();
           if (response.status === 200) {
@@ -218,6 +232,7 @@ const Home: React.FC = () => {
   // Modal
   const handleOpenDialog = (task: Task) => {
     setCurrentTask(task);
+    reset(task);
     setOpenDialog(true);
   };
 
@@ -294,38 +309,63 @@ const Home: React.FC = () => {
         title={currentTask?.id ? 'Editar Tarefa' : 'Criar Tarefa'}
         open={openDialog}
         onCancel={handleCloseDialog}
-        onOk={() => currentTask?.id ? handleEdit() : handleCreate(currentTask!)}
+        onOk={handleSubmit(currentTask?.id ? handleEdit : handleCreate)}
       >
-        <TextField
-          label="Nome da Tarefa"
-          fullWidth
-          margin="normal"
-          value={currentTask?.nomeTarefa || ''}
-          onChange={(e) =>
-            setCurrentTask({ ...currentTask!, nomeTarefa: e.target.value })
-          }
-        />
-        <TextField
-          label="Custo (R$)"
-          fullWidth
-          margin="normal"
-          type="number"
-          value={currentTask?.custo || ''}
-          onChange={(e) =>
-            setCurrentTask({ ...currentTask!, custo: parseFloat(e.target.value) })
-          }
-        />
-        <TextField
-          label="Data Limite"
-          fullWidth
-          margin="normal"
-          type="date"
-          value={currentTask?.dataLimite || ''}
-          onChange={(e) =>
-            setCurrentTask({ ...currentTask!, dataLimite: e.target.value })
-          }
-          slotProps={{inputLabel: { shrink:true } }}
-        />
+        <form onSubmit={handleSubmit(currentTask?.id ? handleEdit : handleCreate)}>
+          <Controller
+            name="nomeTarefa"
+            control={control}
+            rules={{ required: 'O nome da tarefa é obrigatório' }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Nome da Tarefa"
+                fullWidth
+                margin="normal"
+                error={!!errors.nomeTarefa}
+                helperText={errors.nomeTarefa?.message}
+              />
+            )}
+          />
+
+          <Controller
+            name="custo"
+            control={control}
+            rules={{
+              required: 'O custo é obrigatório e deve ser um número válido.',
+              validate: {
+                isNumber: (value) => !isNaN(value) || 'O custo deve ser um número',
+                isPositive: (value) => value >= 0 || 'O custo não pode ser negativo',
+              },
+            }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Custo (R$)"
+                fullWidth
+                margin="normal"
+                type="number"
+                error={!!errors.custo}
+                helperText={errors.custo?.message}
+              />
+            )}
+          />
+
+          <Controller
+            name="dataLimite"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Data Limite"
+                fullWidth
+                margin="normal"
+                type="date"
+                slotProps={{inputLabel: { shrink:true } }}
+              />
+            )}
+          />
+        </form>
       </Modal>
 
       <DialogMessage
