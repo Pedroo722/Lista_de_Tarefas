@@ -2,12 +2,7 @@ import React from 'react';
 import { Box, Pagination } from '@mui/material';
 import { PageSelectorProps } from '../util/types';
 
-const PageSelector: React.FC<PageSelectorProps> = ({
-  currentPage,
-  setCurrentPage,
-  tasksPerPage,
-  tasks,
-}) => {
+const PageSelector: React.FC<PageSelectorProps> = ({ currentPage, tasksPerPage, tasks, setCurrentPage }) => {
   const totalPages = Math.ceil(tasks.length / tasksPerPage);
 
   const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {

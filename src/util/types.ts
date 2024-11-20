@@ -19,10 +19,19 @@ export interface SearchBarProps {
 }
 
 export interface TaskTableProps {
-  tasks: Task[];
-  filteredTasks: Task[];
-  paginateTasks: (tasks: Task[]) => Task[];
-  handleOpenDialog: (task: Task) => void;
-  openDeleteConfirmation: (task: Task) => void;
-  handleReorder: (id: number, direction: 'up' | 'down') => void;
+    tasks: Task[];
+    filteredTasks: Task[];
+    paginateTasks: (tasks: Task[]) => Task[];
+    handleOpenDialog: (task: Task) => void;
+    openDeleteConfirmation: (task: Task) => void;
+    handleReorder: (id: number, direction: 'up' | 'down') => void;
+}
+
+export interface DialogMessageProps {
+    open: boolean;
+    onClose: () => void;
+    title: string;
+    message: string;
+    onConfirm?: () => void;
+    onCancel?: () => void;
 }

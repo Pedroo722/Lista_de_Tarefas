@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Box, CircularProgress, Typography, TextField, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Button, Box, CircularProgress, Typography, TextField } from '@mui/material';
 import { Modal } from 'antd';
 import { baseUrlTasks } from '../util/constants';
 import axios from 'axios';
@@ -7,6 +7,7 @@ import { Task } from '../util/types';
 import PageSelector from '../components/PageSelector';
 import SearchBar from '../components/SearchBar';
 import TaskTable from '../components/TaskTable';
+import DialogMessage from '../components/DialogMessage';
 
 const Home: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -18,7 +19,6 @@ const Home: React.FC = () => {
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
   const [openErrorDialog, setOpenErrorDialog] = useState(false);
-  const [openSuccessDialog, setOpenSuccessDialog] = useState(false);
   const [dialogMessage, setDialogMessage] = useState<string>('');
   const [dialogTitle, setDialogTitle] = useState<string>('');
   const tasksPerPage = 7;
@@ -26,11 +26,11 @@ const Home: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   // Carregar Tarefas
-  const fetchTasks = () => {
+  const fetchTasks = useCallback(() => {
     setLoading(true);
     setLoadingMessage('Carregando tarefas...');
     axios
-      .get(baseUrlTasks, { timeout: 15000 })
+      .get(baseUrlTasks, { timeout: 15000 }) // 15 segundos para emitir mensagem de inatividade
       .then((response) => {
         if (response.status === 200) {
           const dados = response.data;
@@ -54,7 +54,7 @@ const Home: React.FC = () => {
       })
       .catch((error) => {
         if (error.code === 'ECONNABORTED') {
-          setDialogMessage('O servidor caiu por inatividade ou tempo limite de requisição! Por favor aguarde alguns momentos.');
+          setDialogMessage('O servidor caiu por inatividade ou tempo limite de requisição! Por favor aguarde alguns momentos até o servidor reiniciar.');
           fetchTasks();
         } else {
           setDialogMessage('Erro ao conectar com o servidor!');
@@ -68,7 +68,7 @@ const Home: React.FC = () => {
           setLoadingMessage('');
         }
       });
-  };
+  }, [openErrorDialog]);
 
   // Pesquisa
   const handleSearch = (query: string) => {
@@ -115,7 +115,6 @@ const Home: React.FC = () => {
           setTasks([...tasks, response.data]);
           setDialogMessage('Tarefa criada com sucesso!');
           setDialogTitle('Sucesso');
-          setOpenSuccessDialog(true);
           handleCloseDialog();
         } else {
           setDialogMessage('Erro ao criar tarefa no servidor!');
@@ -162,7 +161,6 @@ const Home: React.FC = () => {
             setTasks(tasks.map((task) => task.id === currentTask.id ? response.data : task));
             setDialogMessage('Tarefa editada com sucesso!');
             setDialogTitle('Sucesso');
-            setOpenSuccessDialog(true);
           } else {
             setDialogMessage('Erro ao editar tarefa no servidor!');
             setDialogTitle('Erro');
@@ -192,9 +190,9 @@ const Home: React.FC = () => {
         .delete(`${baseUrlTasks}/${taskToDelete.id}`)
         .then(() => {
           setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskToDelete.id));
+          fetchTasks();
           setDialogMessage('Tarefa excluída com sucesso!');
           setDialogTitle('Sucesso');
-          setOpenSuccessDialog(true);
         })
         .catch((error) => {
           console.error(error);
@@ -241,7 +239,7 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     fetchTasks();
-  }, []);
+  }, [fetchTasks]);
 
   return (
     <Box sx={{ padding: 3 }}>
@@ -330,61 +328,32 @@ const Home: React.FC = () => {
         />
       </Modal>
 
-      <Dialog
+      {loading && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: 3 }}>
+          <CircularProgress />
+          <Typography variant="body2" sx={{ marginLeft: 2 }}>
+            {loadingMessage}
+          </Typography>
+        </Box>
+      )}
+
+      <DialogMessage
         open={openConfirmDialog}
         onClose={closeDeleteConfirmation}
-      >
-        <DialogTitle>Confirmar Exclusão</DialogTitle>
-        <DialogContent>
-          <Typography>Tem certeza que deseja excluir esta tarefa?</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={closeDeleteConfirmation}
-            sx={{ color: 'red' }}
-          >
-            Cancelar
-          </Button>
-          <Button
-            onClick={handleDelete}
-            sx={{
-              backgroundColor: 'green',
-              color: 'white',
-              '&:hover': {
-                backgroundColor: 'darkgreen',
-              },
-            }}
-          >
-            Confirmar
-          </Button>
-        </DialogActions>
-      </Dialog>
+        title="Confirmar Exclusão"
+        message={`Tem certeza que deseja excluir a tarefa "${taskToDelete?.nomeTarefa}"?`}
+        onConfirm={handleDelete}
+        onCancel={closeDeleteConfirmation}
+      />
 
-      <Dialog
-        open={openErrorDialog}
-        onClose={() => setOpenErrorDialog(false)}
-      >
-        <DialogTitle>{dialogTitle}</DialogTitle>
-        <DialogContent>
-          <Typography>{dialogMessage}</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenErrorDialog(false)}>Fechar</Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog
-        open={openSuccessDialog}
-        onClose={() => setOpenSuccessDialog(false)}
-      >
-        <DialogTitle>{dialogTitle}</DialogTitle>
-        <DialogContent>
-          <Typography>{dialogMessage}</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenSuccessDialog(false)}>Fechar</Button>
-        </DialogActions>
-      </Dialog>
+      {dialogMessage && (
+        <DialogMessage
+          open={true}
+          onClose={() => setDialogMessage('')}
+          title={dialogTitle}
+          message={dialogMessage}
+        />
+      )}
     </Box>
   );
 };
