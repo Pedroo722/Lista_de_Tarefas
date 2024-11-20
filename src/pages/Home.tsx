@@ -2,8 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Button, Box, CircularProgress, Typography, TextField } from '@mui/material';
 import { Modal } from 'antd';
 import { baseUrlTasks } from '../util/constants';
-import axios from 'axios';
 import { Task } from '../util/types';
+import axios from 'axios';
 import PageSelector from '../components/PageSelector';
 import SearchBar from '../components/SearchBar';
 import TaskTable from '../components/TaskTable';
@@ -327,15 +327,6 @@ const Home: React.FC = () => {
           slotProps={{inputLabel: { shrink:true } }}
         />
       </Modal>
-
-      {loading && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: 3 }}>
-          <CircularProgress />
-          <Typography variant="body2" sx={{ marginLeft: 2 }}>
-            {loadingMessage}
-          </Typography>
-        </Box>
-      )}
 
       <DialogMessage
         open={openConfirmDialog}
