@@ -224,11 +224,35 @@ const Home: React.FC = () => {
 
   // Reordenação
   const handleReorder = (id: number, direction: 'up' | 'down') => {
-    setDialogMessage("Em implementação...");
-    setDialogTitle("Atenção");
-    setOpenErrorDialog(true);
+    const taskIndex = tasks.findIndex((task) => task.id === id);
+  
+    if ((direction === 'up' && taskIndex === 0) || (direction === 'down' && taskIndex === tasks.length - 1)) {
+      return;
+    }
+  
+    const newTasks = [...tasks];
+    const swapIndex = direction === 'up' ? taskIndex - 1 : taskIndex + 1;
+  
+    // Troca a ordem das tarefas
+    [newTasks[taskIndex], newTasks[swapIndex]] = [newTasks[swapIndex], newTasks[taskIndex]];
+  
+    newTasks[taskIndex].ordemApresentacao = taskIndex + 1;
+    newTasks[swapIndex].ordemApresentacao = swapIndex + 1;
+  
+    setTasks(newTasks);
+    setFilteredTasks(newTasks);
+  
+    // Salvar reordenação no back
+    axios
+      .put(`${baseUrlTasks}/reorder`, newTasks)
+      .then(() => {
+        console.log('Sucesso');
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
-
+  
   // Modal
   const handleOpenDialog = (task: Task) => {
     setCurrentTask(task);
